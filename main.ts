@@ -24,6 +24,13 @@ const isJpeg = bytes.subarray(0, 3).equals(JPEG);
 if (!isPng && !isJpeg) throw new Error('entry.png is neither a PNG nor a JPEG');
 if (bytes.length > 1_048_576) throw new Error(`entry.png is ${bytes.length} bytes, over the 1 MiB cap`);
 
+// A PNG carries its size in the IHDR chunk: width at byte 16, height at byte 20, both BE u32.
+if (isPng) {
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  if (width > 1024 || height > 1024) throw new Error(`entry.png is ${width}x${height}, over the 1024x1024 cap`);
+}
+
 mkdirSync(outputDir, { recursive: true });
 copyFileSync(source, join(outputDir, 'entry.png'));
 statSync(join(outputDir, 'entry.png'));
