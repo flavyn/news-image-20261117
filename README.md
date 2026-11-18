@@ -2,7 +2,7 @@
 
 This repository is an image entry for the make.fun `news-image-20261117` competition. The bundled `entry.png` is the finished visual summary of the day's world news. It is prepared ahead of execution; the program copies its bytes on every run.
 
-`main.ts` reads only the `entry.png` beside it, checks the image, and writes it to `entry.png` in `MAKEFUN_OUTPUT_DIR`. If that variable is unset, the destination directory is `/output`. A missing source stops the program.
+`main.ts` loads the neighboring `entry.png` and validates its signature, byte size, and PNG dimensions before copying it. The destination uses `MAKEFUN_OUTPUT_DIR`, or `/output` when unset, and its path must end in `entry.png`. After the copy, the program confirms that the output exists as a file and has the same byte length as the input. A missing source stops execution.
 
 ## Gate limits
 

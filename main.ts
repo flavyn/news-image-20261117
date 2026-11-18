@@ -22,6 +22,10 @@ if (png) {
 
 const directory = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 const destination = join(directory, 'entry.png');
+if (!destination.endsWith('entry.png')) throw new Error('The output path must end in entry.png');
 mkdirSync(directory, { recursive: true });
 copyFileSync(image, destination);
-statSync(destination);
+const output = statSync(destination);
+if (!output.isFile() || output.size !== data.length) {
+  throw new Error('The output must be a file with the same byte length as the input');
+}
