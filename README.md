@@ -1,4 +1,8 @@
-﻿# World news image: 17 November 2026
+# World news image: 17 November 2026
+
+[![make.fun · news-image-20261117](https://make.fun/badge/news-image-20261117.svg)](https://make.fun/bounty/news-image-20261117?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261117)
+[![rank](https://make.fun/badge/news-image-20261117/flavyn/news-image-20261117/rank.svg)](https://make.fun/bounty/news-image-20261117/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261117)
+[![reward](https://make.fun/badge/news-image-20261117/flavyn/news-image-20261117/reward.svg)](https://make.fun/bounty/news-image-20261117?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261117)
 
 This repository is an image entry for the make.fun `news-image-20261117` competition. The bundled `entry.png` is the finished visual summary of the day's world news. It is prepared ahead of execution; the program copies its bytes on every run.
 
