@@ -1,36 +1,27 @@
-// make.fun — news-image-20261117
-// Writes one image that sums up the world news of Tuesday 17 November 2026 to /output/entry.png.
-//
-// Contract (kit RULES.txt, "The task"):
-//   - output: exactly one file, /output/entry.png, a whole PNG or JPEG of at most 1 MiB
-//     and at most 1024x1024 pixels;
-//   - Node 22, standard library only, no network, 1 CPU, 512 MB, 60 s per run;
-//   - the program runs twice and both runs must write the same bytes.
-//
-// The image itself is rendered at build time and committed beside this file, so the
-// graded run is a byte-for-byte copy: same input, same output, every time.
+﻿// Copy the bundled news image after checking its format and size limits.
 import { copyFileSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-const source = new URL('./entry.png', import.meta.url);
+// Resolve against this module, so the input never depends on the working directory.
+// Reading it also makes a missing source fail before any output is created.
+const image = new URL('./entry.png', import.meta.url);
+const data = readFileSync(image);
+const pngHeader = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+const jpegHeader = Buffer.from([255, 216, 255]);
+const png = data.subarray(0, pngHeader.length).equals(pngHeader);
+const jpeg = data.subarray(0, jpegHeader.length).equals(jpegHeader);
 
-// Fail loudly here rather than let the gate refuse a truncated or oversized image.
-const bytes = readFileSync(source);
-const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-const JPEG = Buffer.from([0xff, 0xd8, 0xff]);
-const isPng = bytes.subarray(0, 8).equals(PNG);
-const isJpeg = bytes.subarray(0, 3).equals(JPEG);
-if (!isPng && !isJpeg) throw new Error('entry.png is neither a PNG nor a JPEG');
-if (bytes.length > 1_048_576) throw new Error(`entry.png is ${bytes.length} bytes, over the 1 MiB cap`);
-
-// A PNG carries its size in the IHDR chunk: width at byte 16, height at byte 20, both BE u32.
-if (isPng) {
-  const width = bytes.readUInt32BE(16);
-  const height = bytes.readUInt32BE(20);
-  if (width > 1024 || height > 1024) throw new Error(`entry.png is ${width}x${height}, over the 1024x1024 cap`);
+if (!png && !jpeg) throw new Error('The bundled entry.png must contain PNG or JPEG bytes');
+if (data.length > 1048576) throw new Error('The bundled image exceeds 1048576 bytes');
+if (png) {
+  // IHDR stores width and height as big-endian integers at these offsets.
+  const width = data.readUInt32BE(16);
+  const height = data.readUInt32BE(20);
+  if (width > 1024 || height > 1024) throw new Error('PNG dimensions exceed 1024 pixels');
 }
 
-mkdirSync(outputDir, { recursive: true });
-copyFileSync(source, join(outputDir, 'entry.png'));
-statSync(join(outputDir, 'entry.png'));
+const directory = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const destination = join(directory, 'entry.png');
+mkdirSync(directory, { recursive: true });
+copyFileSync(image, destination);
+statSync(destination);

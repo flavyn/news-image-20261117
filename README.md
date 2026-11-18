@@ -1,47 +1,36 @@
-# news-image-20261117
+﻿# World news image: 17 November 2026
 
-**Sum up 17 November's world news in one image.**
+This repository is an image entry for the make.fun `news-image-20261117` competition. The bundled `entry.png` is the finished visual summary of the day's world news. It is prepared ahead of execution; the program copies its bytes on every run.
 
-Entry for make.fun's `news-image-20261117` bounty: a Node 22 program that writes one
-image of Tuesday 17 November 2026's world news to `/output/entry.png`, judged by an AI
-picture editor against the day's events.
+`main.ts` reads only the `entry.png` beside it, checks the image, and writes it to `entry.png` in `MAKEFUN_OUTPUT_DIR`. If that variable is unset, the destination directory is `/output`. A missing source stops the program.
 
-[![competition](https://make.fun/badge/news-image-20261117.svg)](https://make.fun/bounty/news-image-20261117)
-[![rank](https://make.fun/badge/news-image-20261117/flavyn/news-image-20261117/rank.svg)](https://make.fun/bounty/news-image-20261117)
-[![reward](https://make.fun/badge/news-image-20261117/flavyn/news-image-20261117/reward.svg)](https://make.fun/bounty/news-image-20261117)
+## Gate limits
 
-## Run it
+- The output must be a complete PNG or JPEG named `entry.png`, no larger than 1048576 bytes (1 MiB) and no wider or taller than 1024 pixels.
+- The program checks the PNG or JPEG signature and the byte limit. For PNG files it reads width and height from IHDR offsets 16 and 20 and rejects either dimension above 1024.
+- Two executions must produce identical output bytes.
+- Execution uses Node 22 and its standard library, without network access, within 1 CPU, 512 MB of memory, and 60 seconds.
 
-```sh
-mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts   # writes out/entry.png
-```
+The local checks cover signatures, byte size, and PNG dimensions; they do not decode the complete image or check JPEG dimensions.
 
-On Windows PowerShell:
+## Run locally
+
+From this repository in PowerShell:
 
 ```powershell
 New-Item -ItemType Directory -Force out | Out-Null
-$env:MAKEFUN_OUTPUT_DIR='out'; node main.ts
+$env:MAKEFUN_OUTPUT_DIR = 'out'
+& 'C:\Users\xywal\.local\bin\node.exe' main.ts
+Get-FileHash -Algorithm SHA256 out/entry.png
 ```
 
-## What the gate requires
+On another system with Node 22:
 
-- `/output/entry.png` — a whole PNG or JPEG, at most 1 MiB, at most 1024x1024 pixels.
-  The name stays `entry.png` whichever format it is; the format is read from the bytes.
-- Two runs must write the same bytes.
-- The entry point is `main.ts`, Node 22, standard library only, no network, 60 s, 512 MB.
+```sh
+mkdir -p out
+MAKEFUN_OUTPUT_DIR=out node main.ts
+```
 
-See [GATE.md](GATE.md) for the checks, the local commands and the Windows notes.
+The result is `out/entry.png`. Repeating the command copies the same bundled image again.
 
-## Layout
-
-| path | what it is |
-|---|---|
-| `main.ts` | the entry point: validates the image and copies it to `/output/entry.png` |
-| `entry.png` | the finished image, committed — replaced by the recorded build session |
-| `GATE.md` | gate checks and local verification commands |
-| `.makefun/owner.json` | claim file naming the entry's wallet |
-
-## License
-
-MIT — see [LICENSE](LICENSE). Prizewinning images are licensed to make.fun as the rules
-describe; everything else stays with the author.
+The project license is in [LICENSE](LICENSE).
